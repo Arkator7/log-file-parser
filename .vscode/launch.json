@@ -1,0 +1,52 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "LogFileParser.Console (Debug)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/src/LogFileParser.Console/bin/Debug/net10.0/LogFileParser.Console.dll",
+      "args": [
+        "${workspaceFolder}/data/programming-task-example-data.log"
+      ],
+      "cwd": "${workspaceFolder}/src/LogFileParser.Console",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DOTNET_ENVIRONMENT": "Development"
+      },
+      "console": "internalConsole",
+      "logging": {
+        "diagnosticsLog": {
+          "fileName": "${workspaceFolder}/logs/vsdbg-diagnostics.log",
+          "level": "verbose"
+        },
+        "trace": false,
+        "moduleLoad": false
+      }
+    },
+    {
+      "name": "LogFileParser.UnitTests",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "dotnet",
+      "args": [
+        "test",
+        "--no-build"
+      ],
+      "cwd": "${workspaceFolder}",
+      "stopAtEntry": false,
+      "console": "internalConsole",
+      "logging": {
+        "diagnosticsLog": {
+          "fileName": "${workspaceFolder}/logs/vsdbg-diagnostics.log",
+          "level": "verbose"
+        },
+        "trace": false,
+        "moduleLoad": false
+      }
+    }
+  ],
+}
