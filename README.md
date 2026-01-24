@@ -45,7 +45,9 @@ LogFileParser/
 ```
 
 ## Assumptions
-- Log format follows Apache Common Log Format
+- Log format follows Apache Common Log format
+   - Time format follows "dd/MMM/yyyy:HH:mm:ss zzz" format (e.g. 10/Jul/2018:22:21:28 +0200)
+   - Request format follows "Method Url Protocol" pattern (e.g. GET /intranet-analytics/ HTTP/1.1)
 - Malformed lines are skipped with a warning
 - File encoding is UTF-8
 - URLs include query strings for uniqueness calculation

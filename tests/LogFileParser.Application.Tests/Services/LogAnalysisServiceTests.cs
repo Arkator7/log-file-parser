@@ -2,6 +2,7 @@ using LogFileParser.Application.Abstractions;
 using LogFileParser.Application.DTOs;
 using LogFileParser.Application.Services;
 using LogFileParser.Domain.Entities;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Shouldly;
 
@@ -42,7 +43,9 @@ public class LogAnalysisServiceTests
         var fileReader = new Mock<ILogFileReader>();
         fileReader.Setup(x => x.ReadLines(filePath)).Returns(logLines);
 
-        var service = new LogAnalysisService(parser.Object, analyser.Object, fileReader.Object);
+        var logger = new Mock<ILogger<LogAnalysisService>>();
+
+        var service = new LogAnalysisService(parser.Object, analyser.Object, fileReader.Object, logger.Object);
 
         // Act
         var result = service.AnalyseLogFile(filePath);
@@ -73,7 +76,9 @@ public class LogAnalysisServiceTests
         var fileReader = new Mock<ILogFileReader>();
         fileReader.Setup(x => x.ReadLines(filePath)).Returns(emptyLines);
 
-        var service = new LogAnalysisService(Mock.Of<ILogParser>(), analyser.Object, fileReader.Object);
+        var logger = new Mock<ILogger<LogAnalysisService>>();
+
+        var service = new LogAnalysisService(Mock.Of<ILogParser>(), analyser.Object, fileReader.Object, logger.Object);
 
         // Act
         var result = service.AnalyseLogFile(filePath);
@@ -113,7 +118,9 @@ public class LogAnalysisServiceTests
         var fileReader = new Mock<ILogFileReader>();
         fileReader.Setup(x => x.ReadLines(filePath)).Returns(logLines);
 
-        var service = new LogAnalysisService(parser.Object, analyser.Object, fileReader.Object);
+        var logger = new Mock<ILogger<LogAnalysisService>>();
+
+        var service = new LogAnalysisService(parser.Object, analyser.Object, fileReader.Object, logger.Object);
 
         // Act
         var result = service.AnalyseLogFile(filePath);
@@ -146,7 +153,9 @@ public class LogAnalysisServiceTests
         var fileReader = new Mock<ILogFileReader>();
         fileReader.Setup(x => x.ReadLines(filePath)).Returns(logLines);
 
-        var service = new LogAnalysisService(parser.Object, analyser.Object, fileReader.Object);
+        var logger = new Mock<ILogger<LogAnalysisService>>();
+
+        var service = new LogAnalysisService(parser.Object, analyser.Object, fileReader.Object, logger.Object);
 
         // Act
         var result = service.AnalyseLogFile(filePath);
@@ -169,7 +178,9 @@ public class LogAnalysisServiceTests
         var fileReader = new Mock<ILogFileReader>();
         fileReader.Setup(x => x.ReadLines(filePath)).Returns(new List<string>());
 
-        var service = new LogAnalysisService(Mock.Of<ILogParser>(), analyser.Object, fileReader.Object);
+        var logger = new Mock<ILogger<LogAnalysisService>>();
+
+        var service = new LogAnalysisService(Mock.Of<ILogParser>(), analyser.Object, fileReader.Object, logger.Object);
 
         // Act
         service.AnalyseLogFile(filePath);
@@ -196,7 +207,10 @@ public class LogAnalysisServiceTests
 
         var fileReader = new Mock<ILogFileReader>();
         fileReader.Setup(x => x.ReadLines(filePath)).Returns(logLines);
-        var service = new LogAnalysisService(parser.Object, analyser.Object, fileReader.Object);
+
+        var logger = new Mock<ILogger<LogAnalysisService>>();
+
+        var service = new LogAnalysisService(parser.Object, analyser.Object, fileReader.Object, logger.Object);
         
         for (int i = 0; i < 1000; i++)
         {
@@ -246,7 +260,9 @@ public class LogAnalysisServiceTests
         var fileReader = new Mock<ILogFileReader>();
         fileReader.Setup(x => x.ReadLines(filePath)).Returns(logLines);
 
-        var service = new LogAnalysisService(parser.Object, analyser.Object, fileReader.Object);
+        var logger = new Mock<ILogger<LogAnalysisService>>();
+
+        var service = new LogAnalysisService(parser.Object, analyser.Object, fileReader.Object, logger.Object);
 
         // Act
         service.AnalyseLogFile(filePath);

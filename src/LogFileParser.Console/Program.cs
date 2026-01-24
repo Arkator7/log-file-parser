@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using LogFileParser.Application.Abstractions;
 using LogFileParser.Application.Services;
 using LogFileParser.Infrastructure.Parsing;
@@ -11,6 +12,12 @@ services.AddScoped<ILogParser, ApacheLogParser>();
 services.AddScoped<ILogAnalyser, LinqLogAnalyser>();
 services.AddScoped<ILogFileReader, LogFileReader>();
 services.AddScoped<LogAnalysisService>();
+
+services.AddLogging(builder =>
+{
+    builder.AddConsole();
+    builder.SetMinimumLevel(LogLevel.Information);
+});
 
 var serviceProvider = services.BuildServiceProvider();
 

@@ -2,6 +2,8 @@ using LogFileParser.Application.Services;
 using LogFileParser.Infrastructure.Analysis;
 using LogFileParser.Infrastructure.FileSystem;
 using LogFileParser.Infrastructure.Parsing;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
 using Shouldly;
 
 namespace LogFileParser.Infrastructure.Tests.Integration;
@@ -17,7 +19,9 @@ public class LogFileParserIntegrationTests
         var parser = new ApacheLogParser();
         var analyser = new LinqLogAnalyser();
         var fileReader = new LogFileReader();
-        var service = new LogAnalysisService(parser, analyser, fileReader);
+        var logger = new FakeLogger<LogAnalysisService>();
+
+        var service = new LogAnalysisService(parser, analyser, fileReader, logger);
 
         var logFilePath = GetTestDataPath("valid-log-file.log");
 
@@ -41,7 +45,9 @@ public class LogFileParserIntegrationTests
         var parser = new ApacheLogParser();
         var analyser = new LinqLogAnalyser();
         var fileReader = new LogFileReader();
-        var service = new LogAnalysisService(parser, analyser, fileReader);
+        var logger = new FakeLogger<LogAnalysisService>();
+
+        var service = new LogAnalysisService(parser, analyser, fileReader, logger);
 
         var logFilePath = GetTestDataPath("invalid-mixed-with-valid-lines.log");
 
@@ -52,6 +58,23 @@ public class LogFileParserIntegrationTests
         result.UniqueIpCount.ShouldBe(2);
         result.TopUrls[0].Url.ShouldBe("/home");
         result.TopUrls[0].Count.ShouldBe(2);
+
+        var warnings = logger.Collector.GetSnapshot()
+            .Where(e => e.Level == LogLevel.Warning)
+            .ToList();
+
+        warnings.Count.ShouldBe(4); // 3 individual line warnings + 1 summary warning
+
+        warnings[0].Message.ShouldContain("Skipping malformed line 2");
+        warnings[0].Message.ShouldContain("This is an invalid line");
+        
+        warnings[1].Message.ShouldContain("Skipping malformed line 3");
+        warnings[1].Message.ShouldContain("Another invalid line");
+
+        warnings[2].Message.ShouldContain("Skipping malformed line 5");
+        warnings[2].Message.ShouldContain("Corrupt data here");
+
+        warnings[3].Message.ShouldContain("Skipped 3 malformed line(s) out of 6 total lines");
     }
 
     [Fact]
@@ -61,7 +84,9 @@ public class LogFileParserIntegrationTests
         var parser = new ApacheLogParser();
         var analyser = new LinqLogAnalyser();
         var fileReader = new LogFileReader();
-        var service = new LogAnalysisService(parser, analyser, fileReader);
+        var logger = new FakeLogger<LogAnalysisService>();
+
+        var service = new LogAnalysisService(parser, analyser, fileReader, logger);
 
         var logFilePath = GetTestDataPath("valid-different-http-methods.log");
 
@@ -80,7 +105,9 @@ public class LogFileParserIntegrationTests
         var parser = new ApacheLogParser();
         var analyser = new LinqLogAnalyser();
         var fileReader = new LogFileReader();
-        var service = new LogAnalysisService(parser, analyser, fileReader);
+        var logger = new FakeLogger<LogAnalysisService>();
+
+        var service = new LogAnalysisService(parser, analyser, fileReader, logger);
 
         var logFilePath = GetTestDataPath("valid-with-query-strings.log");
 
@@ -100,7 +127,9 @@ public class LogFileParserIntegrationTests
         var parser = new ApacheLogParser();
         var analyser = new LinqLogAnalyser();
         var fileReader = new LogFileReader();
-        var service = new LogAnalysisService(parser, analyser, fileReader);
+        var logger = new FakeLogger<LogAnalysisService>();
+
+        var service = new LogAnalysisService(parser, analyser, fileReader, logger);
 
         var logFilePath = GetTestDataPath("valid-with-ip6-addresses.log");
 
@@ -120,7 +149,9 @@ public class LogFileParserIntegrationTests
         var parser = new ApacheLogParser();
         var analyser = new LinqLogAnalyser();
         var fileReader = new LogFileReader();
-        var service = new LogAnalysisService(parser, analyser, fileReader);
+        var logger = new FakeLogger<LogAnalysisService>();
+
+        var service = new LogAnalysisService(parser, analyser, fileReader, logger);
 
         var logFilePath = GetTestDataPath("valid-real-world-data.log");
 
@@ -146,7 +177,9 @@ public class LogFileParserIntegrationTests
         var parser = new ApacheLogParser();
         var analyser = new LinqLogAnalyser();
         var fileReader = new LogFileReader();
-        var service = new LogAnalysisService(parser, analyser, fileReader);
+        var logger = new FakeLogger<LogAnalysisService>();
+
+        var service = new LogAnalysisService(parser, analyser, fileReader, logger);
 
         var logFilePath = GetTestDataPath("valid-with-different-status-codes.log");
 
@@ -165,17 +198,49 @@ public class LogFileParserIntegrationTests
         var parser = new ApacheLogParser();
         var analyser = new LinqLogAnalyser();
         var fileReader = new LogFileReader();
-        var service = new LogAnalysisService(parser, analyser, fileReader);
+        var logger = new FakeLogger<LogAnalysisService>();
+
+        var service = new LogAnalysisService(parser, analyser, fileReader, logger);
 
         var logFilePath = GetTestDataPath("programming-task-example-data.log");
 
         // Act
         var result = service.AnalyseLogFile(logFilePath);
 
-        // Assert
-        result.UniqueIpCount.ShouldBeGreaterThan(0);
-        result.TopUrls.Count.ShouldBeLessThanOrEqualTo(3);
-        result.TopIpAddresses.Count.ShouldBeLessThanOrEqualTo(3);
+        // Assert - Business Logic
+        result.UniqueIpCount.ShouldBe(11);
+
+        result.TopUrls.Count.ShouldBe(3);
+        result.TopUrls[0].Url.ShouldBe("/docs/manage-websites/");
+        result.TopUrls[0].Count.ShouldBe(2);
+        result.TopUrls[1].Url.ShouldBe("/intranet-analytics/");
+        result.TopUrls[1].Count.ShouldBe(1);
+        result.TopUrls[2].Url.ShouldBe("http://example.net/faq/");
+        result.TopUrls[2].Count.ShouldBe(1);
+
+        result.TopIpAddresses.Count.ShouldBe(3);
+        result.TopIpAddresses[0].IpAddress.ShouldBe("168.41.191.40");
+        result.TopIpAddresses[0].Count.ShouldBe(4);
+        result.TopIpAddresses[1].IpAddress.ShouldBe("177.71.128.21");
+        result.TopIpAddresses[1].Count.ShouldBe(3);
+        result.TopIpAddresses[2].IpAddress.ShouldBe("50.112.00.11");
+        result.TopIpAddresses[2].Count.ShouldBe(3);
+
+        var warnings = logger.Collector.GetSnapshot()
+            .Where(e => e.Level == LogLevel.Warning)
+            .ToList();
+        
+        warnings.Count.ShouldBe(3); // 2 individual line warnings + 1 summary warning
+
+        warnings[0].Message.ShouldContain("Skipping malformed line 13");
+        warnings[0].Message.ShouldContain("72.44.32.10");
+        warnings[0].Message.ShouldContain("junk extra");
+        
+        warnings[1].Message.ShouldContain("Skipping malformed line 14");
+        warnings[1].Message.ShouldContain("168.41.191.9");
+        warnings[1].Message.ShouldContain("456 789");
+
+        warnings[2].Message.ShouldContain("Skipped 2 malformed line(s) out of 23 total lines");
     }
 
     private static string GetTestDataPath(string fileName)

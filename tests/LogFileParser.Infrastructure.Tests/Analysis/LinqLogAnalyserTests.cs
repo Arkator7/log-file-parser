@@ -99,19 +99,19 @@ public class LinqLogAnalyserTests
             CreateLogEntry("192.168.1.2", "/home"),
             CreateLogEntry("192.168.1.3", "/home"),
             CreateLogEntry("192.168.1.4", "/home"),
-            CreateLogEntry("192.168.1.5", "/home"), // 5 visits
+            CreateLogEntry("192.168.1.5", "/home"),
             
             CreateLogEntry("192.168.1.1", "/about"),
             CreateLogEntry("192.168.1.2", "/about"),
-            CreateLogEntry("192.168.1.3", "/about"), // 3 visits
+            CreateLogEntry("192.168.1.3", "/about"),
             
             CreateLogEntry("192.168.1.1", "/contact"),
             CreateLogEntry("192.168.1.2", "/contact"),
             CreateLogEntry("192.168.1.3", "/contact"),
-            CreateLogEntry("192.168.1.4", "/contact"), // 4 visits
+            CreateLogEntry("192.168.1.4", "/contact"),
             
             CreateLogEntry("192.168.1.1", "/services"),
-            CreateLogEntry("192.168.1.2", "/services") // 2 visits
+            CreateLogEntry("192.168.1.2", "/services")
         };
 
         var analyser = new LinqLogAnalyser();
@@ -163,19 +163,19 @@ public class LinqLogAnalyserTests
             CreateLogEntry("192.168.1.1", "/about"),
             CreateLogEntry("192.168.1.1", "/contact"),
             CreateLogEntry("192.168.1.1", "/services"),
-            CreateLogEntry("192.168.1.1", "/pricing"), // 5 requests
+            CreateLogEntry("192.168.1.1", "/pricing"),
             
             CreateLogEntry("192.168.1.2", "/home"),
             CreateLogEntry("192.168.1.2", "/about"),
-            CreateLogEntry("192.168.1.2", "/contact"), // 3 requests
+            CreateLogEntry("192.168.1.2", "/contact"),
             
             CreateLogEntry("192.168.1.3", "/home"),
             CreateLogEntry("192.168.1.3", "/about"),
             CreateLogEntry("192.168.1.3", "/contact"),
-            CreateLogEntry("192.168.1.3", "/services"), // 4 requests
+            CreateLogEntry("192.168.1.3", "/services"),
             
             CreateLogEntry("192.168.1.4", "/home"),
-            CreateLogEntry("192.168.1.4", "/about") // 2 requests
+            CreateLogEntry("192.168.1.4", "/about")
         };
 
         var analyser = new LinqLogAnalyser();
@@ -220,7 +220,7 @@ public class LinqLogAnalyserTests
     [Fact]
     public void Analyse_WithTiedCounts_ShouldReturnDeterministicOrder()
     {
-        // Arrange - all URLs have same count
+        // Arrange
         var entries = new List<LogEntry>
         {
             CreateLogEntry("192.168.1.1", "/home"),
@@ -234,7 +234,7 @@ public class LinqLogAnalyserTests
         // Act
         var result = analyser.Analyse(entries);
 
-        // Assert - should return 3 items even though all tied
+        // Assert
         result.TopUrls.Count.ShouldBe(3);
         result.TopUrls.ShouldAllBe(url => url.Count == 1);
     }
