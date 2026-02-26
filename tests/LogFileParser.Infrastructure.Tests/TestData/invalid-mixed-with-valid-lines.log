@@ -1,0 +1,6 @@
+177.71.128.21 - - [10/Jul/2018:22:21:28 +0200] "GET /home HTTP/1.1" 200 3574 "-" "Mozilla/5.0"
+This is an invalid line
+Another invalid line
+168.41.191.40 - - [10/Jul/2018:22:21:29 +0200] "GET /about HTTP/1.1" 200 1234 "-" "Mozilla/5.0"
+Corrupt data here
+177.71.128.21 - - [10/Jul/2018:22:21:30 +0200] "GET /home HTTP/1.1" 200 5678 "-" "Mozilla/5.0"
